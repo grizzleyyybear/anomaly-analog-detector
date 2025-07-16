@@ -59,5 +59,8 @@ Install dependencies
 
 pip install -r requirements.txt
 
+## The ML agent repo is availaible at :
+https://github.com/grizzleyyybear/ml_anomaly_detection
+
 
 
