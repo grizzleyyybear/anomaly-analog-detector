@@ -9,10 +9,18 @@ export default function Home() {
   const [anomalyStatus, setAnomalyStatus] = useState('Normal');
 
   useEffect(() => {
-    
-    const ABLY_API_KEY = 'zmmFew.Ar9xMg:JHpKZPm5YoWuFqaS3tNw1OpDA4aN_7q1zoPl6ALRkic';
+    // This function securely fetches a temporary token from our backend API route.
+    const authCallback = (tokenParams, callback) => {
+      fetch('/api/ably-token')
+        .then(res => res.json())
+        .then(tokenRequest => callback(null, tokenRequest))
+        .catch(err => callback(err, null));
+    };
 
-    const ably = new Realtime({ key: ABLY_API_KEY });
+    // The Ably client now connects using the secure authCallback method.
+    // The secret API key is never exposed to the browser.
+    const ably = new Realtime({ authCallback: authCallback });
+
     const signalChannel = ably.channels.get('signal-channel');
     const anomalyChannel = ably.channels.get('anomaly-channel');
 
@@ -24,7 +32,7 @@ export default function Home() {
       setAnomalyStatus(message.data.status);
     });
 
-    // Cleanup on component unmount
+    // Clean up connections when the component is unmounted.
     return () => {
       signalChannel.unsubscribe();
       anomalyChannel.unsubscribe();
