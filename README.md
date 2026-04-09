@@ -74,17 +74,26 @@ Once running, the dashboard will light up with live data.
 ## What's in here
 
 ```
-src/app/
-├── api/ably-token/route.js     # secure token endpoint (key never hits the browser)
-├── components/
-│   ├── SignalChart.js           # rolling waveform with anomaly markers
-│   ├── MetricCard.js            # reusable stat card
-│   ├── AnomalyLog.js            # timestamped event history
-│   └── PipelineStatus.js        # connection → stage 1 → stage 2 indicators
-├── hooks/useAbly.js             # all real-time data logic
-├── page.js                      # main dashboard
-├── layout.js
+src/app/                             # Next.js dashboard
+├── api/ably-token/route.js          # secure token endpoint
+├── components/                      # SignalChart, MetricCard, AnomalyLog, PipelineStatus
+├── hooks/useAbly.js                 # real-time data logic
+├── page.js                          # main dashboard
 └── globals.css
+
+ml/                                  # Python ML pipeline
+├── config.py                        # all hyperparameters
+├── live_agent.py                    # real-time inference → Ably
+├── requirements.txt
+├── src/
+│   ├── generate_data.py             # synthetic data + 5 anomaly types
+│   ├── corrector_model.py           # ADC Corrector MLP
+│   ├── model.py                     # LSTM Autoencoder
+│   ├── data_preprocessing.py        # train/val/test split + feature engineering
+│   ├── train_and_evaluate.py        # training + P/R/F1 evaluation
+│   └── export_onnx.py              # ONNX export for edge deployment
+├── checkpoints/                     # trained weights + metrics (gitignored)
+└── data/                            # generated CSVs (gitignored)
 ```
 
 ## Deploy
@@ -95,9 +104,20 @@ npm run build && vercel deploy
 
 Set `ABLY_API_KEY` in Vercel's environment variables.
 
-## ML agent
+## Running the ML pipeline
 
-The models and inference pipeline live in a separate repo: **[ml_anomaly_detection](https://github.com/grizzleyyybear/ml_anomaly_detection)**
+```bash
+cd ml
+python -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env                               # add your Ably key
+
+python src/generate_data.py            # generate training data
+python src/corrector_model.py          # train Stage 1
+cd src && python train_and_evaluate.py # train Stage 2 + evaluate
+python export_onnx.py                  # export to ONNX
+cd .. && python live_agent.py          # start streaming to dashboard
+```
 
 ## License
 

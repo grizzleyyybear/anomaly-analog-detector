@@ -1,0 +1,11 @@
+numpy
+pandas
+matplotlib
+scikit-learn
+torch
+pytorch-lightning
+tqdm
+ably
+python-dotenv
+onnx
+onnxruntime

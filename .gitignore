@@ -30,6 +30,7 @@ yarn-error.log*
 
 # env files
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -37,3 +38,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ML artifacts
+ml/checkpoints/*.ckpt
+ml/checkpoints/*.pt
+ml/checkpoints/onnx/
+ml/data/*.csv
+ml/lightning_logs/
+ml/**/__pycache__/
+ml/**/*.pyc
+ml/*.png
+ml/venv/
+ml/.venv/
