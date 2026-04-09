@@ -13,7 +13,7 @@
   --accent-green: #22c55e;
   --accent-red: #ef4444;
   --accent-yellow: #eab308;
-  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  --font-mono: ui-monospace, 'SFMono-Regular', monospace;
   --radius: 12px;
   --radius-sm: 8px;
 }
@@ -24,7 +24,7 @@
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: var(--font-geist-sans, system-ui, -apple-system, sans-serif);
+  font-family: system-ui, -apple-system, sans-serif;
   margin: 0;
   min-height: 100vh;
 }
