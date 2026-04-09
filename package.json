@@ -12,7 +12,8 @@
     "ably": "^2.10.1",
     "next": "15.4.1",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

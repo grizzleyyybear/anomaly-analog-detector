@@ -1,66 +1,200 @@
-<img width="1912" height="1021" alt="image" src="https://github.com/user-attachments/assets/a884122d-1198-48d6-8b61-502d846fb59c" />
-<img width="1918" height="1029" alt="image" src="https://github.com/user-attachments/assets/57f7070d-a81e-4fca-a039-e7f018d4ec19" />
-# Real-Time Industrial Anomaly Detection with a Dual-ML Pipeline
+<div align="center">
 
-This project demonstrates a complete, end-to-end system for real-time anomaly detection in industrial sensor data. It features a dual-ML pipeline for signal correction and anomaly detection, with results broadcast to a live web dashboard. The system is designed with edge deployment in mind, making it suitable for hardware like TI Sitara processors.
+# ◈ Anomaly Analog Detector
 
-**Live Demo:** [Link to your deployed Vercel Dashboard]
+**Real-time industrial anomaly detection powered by a dual-ML pipeline**
 
-## Project Overview
+A live monitoring dashboard that visualizes sensor data, corrects ADC non-linearities with an MLP, and detects anomalies using an LSTM autoencoder — all streaming in real time.
 
-The system simulates a common industrial scenario where a raw sensor signal must be cleaned and monitored for failures in real-time. It uses a two-stage machine learning pipeline to achieve this:
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-Lightning-ee4c2c?logo=pytorch)](https://pytorch.org/)
+[![Ably](https://img.shields.io/badge/Ably-Realtime-ff5416?logo=ably)](https://ably.com/)
+[![Deploy](https://img.shields.io/badge/Deploy-Vercel-000?logo=vercel)](https://vercel.com/)
 
-1.  **Stage 1: ADC Corrector Model:** A Multi-Layer Perceptron (MLP) acts as a replacement for a traditional Look-Up Table (LUT), correcting non-linearities from the Analog-to-Digital Converter (ADC).
-2.  **Stage 2: Anomaly Detection Model:** An LSTM Autoencoder, trained only on normal data, receives the corrected signal and identifies anomalies by detecting high reconstruction error.
+</div>
 
-The entire pipeline runs locally via a Python "agent," which then publishes the signal value and system status to a live web dashboard using a real-time messaging service.
+---
 
+## What This Actually Does
+
+In industrial settings, analog sensors feed signals through an ADC (Analog-to-Digital Converter) that introduces non-linearities. Those distortions make it hard to detect real anomalies.
+
+This project solves that with a **two-stage ML pipeline**:
+
+1. **Stage 1 — ADC Corrector (MLP):** Cleans the raw signal by replacing the traditional look-up table with a trained neural network. Faster, more accurate, deployable on edge hardware.
+
+2. **Stage 2 — Anomaly Detector (LSTM Autoencoder):** Trained only on *normal* data, it learns what "healthy" looks like. When reconstruction error spikes above a dynamically calculated threshold, it flags an anomaly.
+
+The corrected signal and detection results stream to this dashboard in real time via [Ably](https://ably.com/).
+
+```
+┌─────────────┐     ┌────────────────┐     ┌───────────────────┐     ┌──────────────┐
+│  Raw Sensor  │────▸│  ADC Corrector  │────▸│  LSTM Autoencoder  │────▸│  Dashboard   │
+│  Signal      │     │  (MLP)          │     │  (Anomaly Det.)    │     │  (Next.js)   │
+└─────────────┘     └────────────────┘     └───────────────────┘     └──────────────┘
+                        Stage 1                  Stage 2               Real-time UI
+```
 
 ## Features
 
-- **Dual-ML Pipeline:** Sequentially combines a correction model and a detection model for higher accuracy.
-- **Real-Time Processing:** The local agent processes and analyzes the signal with low latency.
-- **Live Web Dashboard:** A deployed Next.js application visualizes the signal and system status for remote monitoring.
-- **Optimized for Edge:** The models are designed to be quantized and exported to ONNX for efficient inference on edge hardware.
-- **Dynamic Anomaly Threshold:** The system intelligently calculates an anomaly threshold based on the model's performance on normal data, avoiding hard-coded "magic numbers."
+- **Dual-ML pipeline** — correction + detection in sequence for production-grade accuracy
+- **Real-time signal chart** — rolling waveform visualization with anomaly markers
+- **Live anomaly alerts** — instant visual feedback when the system detects failures
+- **Pipeline health monitoring** — see the status of each ML stage at a glance
+- **Signal statistics** — live min, max, mean, and standard deviation
+- **Reconstruction error gauge** — watch how close the signal is to the anomaly threshold
+- **Event log** — timestamped history of all detection events
+- **Responsive design** — works on desktop and mobile for field monitoring
+- **Edge-ready models** — designed for ONNX export and quantization on TI Sitara hardware
+- **Secure token auth** — Ably API keys never touch the browser
 
 ## Tech Stack
 
-- **Machine Learning & Backend:**
-  - Python
-  - PyTorch & PyTorch Lightning
-  - Scikit-learn, NumPy, Pandas
-  - Ably (for real-time messaging)
-- **Frontend:**
-  - Next.js (React Framework)
-  - Tailwind CSS
-  - Vercel (for deployment)
-- **DevOps & Infrastructure:**
-  - Git & GitHub
-  - Virtual Environments (`venv`)
-  - Node Version Manager (`nvm`)
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | Next.js 15, React 19, Recharts, Tailwind CSS 4 |
+| **Real-time** | Ably (WebSocket messaging) |
+| **ML Pipeline** | Python, PyTorch Lightning, Scikit-learn |
+| **Models** | MLP (ADC correction), LSTM Autoencoder (anomaly detection) |
+| **Deployment** | Vercel (dashboard), Local/Edge (ML agent) |
 
-## Local Setup and Installation
+## Getting Started
 
-### Prerequisites
+### 1. Clone and install
 
-- Python 3.9+
-- An Ably API Key ([get one for free](https://ably.com/))
-- Node.js (installed via `nvm` is recommended)
+```bash
+git clone https://github.com/grizzleyyybear/anomaly-analog-detector.git
+cd anomaly-analog-detector
+npm install
+```
 
+### 2. Configure environment
 
+```bash
+cp .env.example .env.local
+```
 
-Clone the repository and set up the Python environment.
-Create and activate a virtual environment
+Open `.env.local` and add your [Ably API key](https://ably.com/) (free tier available):
 
+```
+ABLY_API_KEY=your-ably-api-key-here
+```
+
+### 3. Run the dashboard
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). The dashboard will show "Waiting for data..." until the ML agent starts streaming.
+
+### 4. Start the ML agent
+
+The ML pipeline runs separately. Clone and set up the companion repo:
+
+```bash
+git clone https://github.com/grizzleyyybear/ml_anomaly_detection.git
+cd ml_anomaly_detection
 python -m venv venv
-source venv/bin/activate
-Install dependencies
-
+source venv/bin/activate    # Windows: venv\Scripts\activate
 pip install -r requirements.txt
+python agent.py
+```
 
-## The ML agent repo is availaible at :
-https://github.com/grizzleyyybear/ml_anomaly_detection
+Once running, the dashboard will light up with live data.
 
+## Project Structure
 
+```
+anomaly-analog-detector/
+├── src/
+│   └── app/
+│       ├── api/
+│       │   └── ably-token/
+│       │       └── route.js            # Secure token endpoint
+│       ├── components/
+│       │   ├── SignalChart.js           # Real-time waveform chart
+│       │   ├── MetricCard.js            # Reusable metric display
+│       │   ├── AnomalyLog.js            # Event history log
+│       │   └── PipelineStatus.js        # ML pipeline indicators
+│       ├── hooks/
+│       │   └── useAbly.js               # Ably connection + data management
+│       ├── page.js                      # Main dashboard
+│       ├── layout.js                    # App layout + metadata
+│       └── globals.css                  # Dashboard theme + styles
+├── .env.example                         # Environment template
+├── next.config.mjs
+└── package.json
+```
 
+## How the Pipeline Works
+
+### ADC Corrector (Stage 1)
+
+The MLP replaces the traditional polynomial or LUT-based correction with a learned mapping:
+
+- **Input:** Raw 12-bit ADC reading
+- **Output:** Corrected analog value
+- **Why ML:** Handles complex non-linearities that polynomial fitting misses, especially at range edges
+
+### LSTM Autoencoder (Stage 2)
+
+Trained exclusively on normal operating data using reconstruction-based anomaly detection:
+
+- **Input:** Sliding window of corrected signal values
+- **Output:** Reconstructed signal + reconstruction error
+- **Anomaly decision:** Error > dynamic threshold (mean + 3σ of training errors)
+- **Why LSTM:** Captures temporal dependencies in the signal that feed-forward networks miss
+
+### Dynamic Thresholding
+
+No magic numbers. The threshold is computed from the model's own performance on validation data:
+
+```
+threshold = mean(validation_errors) + 3 × std(validation_errors)
+```
+
+This adapts to each deployment automatically.
+
+## Deployment
+
+### Dashboard (Vercel)
+
+```bash
+npm run build
+vercel deploy
+```
+
+Set `ABLY_API_KEY` in your Vercel project's environment variables.
+
+### ML Agent (Edge / Local)
+
+The ML agent is designed for deployment on edge hardware:
+
+- Export models to ONNX with `torch.onnx.export()`
+- Quantize to INT8 for TI Sitara AM62x / AM64x
+- Run inference with ONNX Runtime or TI's Edge AI SDK
+
+## Companion Repository
+
+The ML pipeline (training, inference, agent) lives here:
+
+**→ [ml_anomaly_detection](https://github.com/grizzleyyybear/ml_anomaly_detection)**
+
+## Contributing
+
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feat/your-feature`)
+3. Commit your changes (`git commit -m 'feat: add your feature'`)
+4. Push to the branch (`git push origin feat/your-feature`)
+5. Open a Pull Request
+
+## License
+
+MIT
+
+---
+
+<div align="center">
+  <sub>Built for industrial signal monitoring. Designed for the edge.</sub>
+</div>
