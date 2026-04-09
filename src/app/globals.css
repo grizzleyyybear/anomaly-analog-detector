@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* ===== Design Tokens ===== */
 :root {
   --bg-primary: #0b0f19;
   --bg-secondary: #111827;
@@ -18,7 +17,6 @@
   --radius-sm: 8px;
 }
 
-/* ===== Base ===== */
 * { box-sizing: border-box; }
 
 body {
@@ -29,7 +27,6 @@ body {
   min-height: 100vh;
 }
 
-/* ===== Dashboard Layout ===== */
 .dashboard {
   max-width: 1280px;
   margin: 0 auto;
@@ -91,7 +88,6 @@ body {
   border-top: 1px solid var(--border-color);
 }
 
-/* ===== Connection Badge ===== */
 .connection-badge {
   display: flex;
   align-items: center;
@@ -141,7 +137,6 @@ body {
   50% { opacity: 0.4; }
 }
 
-/* ===== Section Title ===== */
 .section-title {
   font-size: 0.85rem;
   font-weight: 600;
@@ -151,7 +146,6 @@ body {
   margin: 0 0 16px;
 }
 
-/* ===== Chart ===== */
 .chart-placeholder {
   display: flex;
   align-items: center;
@@ -161,7 +155,6 @@ body {
   font-style: italic;
 }
 
-/* ===== Metric Cards ===== */
 .metric-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -196,7 +189,6 @@ body {
 .metric-card--warning .metric-card__value { color: var(--accent-yellow); }
 .metric-card--info    .metric-card__value { color: var(--accent-cyan); }
 
-/* ===== Pipeline Status ===== */
 .pipeline-status {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -238,7 +230,6 @@ body {
 .status-dot--idle   { background: var(--accent-yellow); }
 .status-dot--error  { background: var(--accent-red); }
 
-/* ===== Stats Grid ===== */
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
 .stat-item {
@@ -253,7 +244,6 @@ body {
 .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
 .stat-value { font-family: var(--font-mono); font-weight: 600; color: var(--accent-cyan); }
 
-/* ===== Error Gauge ===== */
 .error-gauge__values {
   display: flex;
   justify-content: space-between;
@@ -285,7 +275,6 @@ body {
 
 .error-gauge__percent { font-size: 0.8rem; color: var(--text-muted); margin: 8px 0 0; text-align: right; }
 
-/* ===== Anomaly Log ===== */
 .anomaly-log {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -337,16 +326,13 @@ body {
 .anomaly-log__entry--normal  .anomaly-log__status { color: var(--accent-green); }
 .anomaly-log__error { margin-left: auto; font-family: var(--font-mono); color: var(--text-muted); font-size: 0.75rem; }
 
-/* ===== Utilities ===== */
 .text-muted { color: var(--text-muted); font-style: italic; font-size: 0.875rem; }
 
-/* ===== Scrollbar ===== */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }
 ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-/* ===== Responsive ===== */
 @media (max-width: 1024px) {
   .dashboard__metrics { grid-template-columns: repeat(2, 1fr); }
 }
