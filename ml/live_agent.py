@@ -26,12 +26,18 @@ shutdown_event = asyncio.Event()
 
 def load_threshold():
     if not config.THRESHOLD_FILE.exists():
-        log.warning("threshold.json not found — using fallback threshold 0.1")
-        return 0.1, {}
-    with open(config.THRESHOLD_FILE) as f:
-        data = json.load(f)
-    log.info(f"Threshold loaded: {data['threshold']:.6f} (mean={data['mean_loss']:.6f}, {data['sigma']}σ)")
-    return data["threshold"], data
+        log.warning("threshold.json not found — using fallback threshold")
+        return config.FALLBACK_THRESHOLD, {}
+    try:
+        with open(config.THRESHOLD_FILE) as f:
+            data = json.load(f)
+        if "threshold" not in data:
+            raise ValueError("Missing 'threshold' key")
+        log.info(f"Threshold loaded: {data['threshold']:.6f} (mean={data['mean_loss']:.6f}, {data['sigma']}σ)")
+        return data["threshold"], data
+    except (json.JSONDecodeError, ValueError, KeyError) as e:
+        log.warning(f"Failed to parse threshold.json: {e} — using fallback")
+        return config.FALLBACK_THRESHOLD, {}
 
 
 def load_models():
@@ -57,7 +63,16 @@ def load_models():
     log.info(f"Stage 2 — LSTM Autoencoder loaded ✓ (features={n_features})")
 
     threshold, threshold_meta = load_threshold()
-    return corrector, x_max, y_max, lstm_model, threshold, n_features, device
+
+    scaler = None
+    if config.SCALER_FILE.exists():
+        import joblib
+        scaler = joblib.load(str(config.SCALER_FILE))
+        log.info("Feature scaler loaded ✓")
+    else:
+        log.warning("scaler.joblib not found — features will not be normalized")
+
+    return corrector, x_max, y_max, lstm_model, threshold, n_features, device, scaler
 
 
 class FeatureBuffer:
@@ -80,6 +95,11 @@ class FeatureBuffer:
 
         return [value, rate, rolling_std, rolling_mean]
 
+    def scale(self, window, scaler):
+        """Apply the training scaler to a window of features."""
+        window_array = np.array(window)
+        return scaler.transform(window_array)
+
     @property
     def ready(self):
         return len(self.raw_history) >= self.seq_length
@@ -90,7 +110,7 @@ async def run_pipeline():
         log.error("ABLY_API_KEY not set. Create a .env file (see .env.example)")
         sys.exit(1)
 
-    corrector, x_max, y_max, lstm_model, threshold, n_features, device = load_models()
+    corrector, x_max, y_max, lstm_model, threshold, n_features, device, scaler = load_models()
 
     ably = AblyRealtime(config.ABLY_API_KEY)
     await ably.connection.once_async("connected")
@@ -140,9 +160,11 @@ async def run_pipeline():
             stage2_status = "active"
             window = list(feature_history)[-config.SEQ_LENGTH:]
 
-            # Use only the features the model was trained on
-            if n_features == 1:
-                tensor_data = [[f[0]] for f in window]
+            # Scale features if scaler is available, then trim to model input size
+            if scaler is not None:
+                window_array = np.array(window)
+                window_scaled = scaler.transform(window_array)
+                tensor_data = window_scaled[:, :n_features].tolist()
             else:
                 tensor_data = [f[:n_features] for f in window]
 

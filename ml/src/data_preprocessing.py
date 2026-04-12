@@ -3,8 +3,9 @@ import torch
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 import os
+from pathlib import Path
 import sys
-sys.path.insert(0, str(__import__('pathlib').Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config
 
 FEATURE_COLS = ["value", "rate_of_change", "rolling_std", "rolling_mean"]

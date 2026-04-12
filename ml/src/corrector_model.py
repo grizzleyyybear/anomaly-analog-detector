@@ -1,8 +1,9 @@
 import logging
 import torch
 import torch.nn as nn
+from pathlib import Path
 import sys
-sys.path.insert(0, str(__import__('pathlib').Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config
 
 log = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ def train_corrector():
     criterion = nn.MSELoss()
 
     dataset = torch.utils.data.TensorDataset(x_norm, y_norm)
-    loader = torch.utils.data.DataLoader(dataset, batch_size=256, shuffle=True)
+    loader = torch.utils.data.DataLoader(dataset, batch_size=config.BATCH_SIZE, shuffle=True)
 
     log.info(f"Training ADC Corrector — {config.CORRECTOR_EPOCHS} epochs")
     model.train()

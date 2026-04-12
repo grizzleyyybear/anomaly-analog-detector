@@ -6,9 +6,10 @@ from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import precision_score, recall_score, f1_score, confusion_matrix
+from pathlib import Path
 import sys
 
-sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config
 from data_preprocessing import get_data_loaders, create_sequences
 from model import LSTMAutoencoder
@@ -39,6 +40,11 @@ def train_lstm():
 
     log.info("Loading data with train/val/test split")
     data = get_data_loaders(str(data_file), config.SEQ_LENGTH, config.BATCH_SIZE)
+
+    import joblib
+    joblib.dump(data["scaler"], str(config.SCALER_FILE))
+    log.info(f"Scaler saved → {config.SCALER_FILE}")
+
     train_loader = data["train_loader"]
     val_loader = data["val_loader"]
     test_loader = data["test_loader"]
@@ -173,7 +179,7 @@ def train_lstm():
     fig.legend(loc="upper right", bbox_to_anchor=(1, 1), bbox_transform=ax1.transAxes)
     plt.grid(True)
 
-    plot_file = config.PROJECT_ROOT / "anomaly_detection_result.png"
+    plot_file = config.ML_ROOT / "anomaly_detection_result.png"
     plt.savefig(plot_file, dpi=150, bbox_inches="tight")
     log.info(f"Plot saved → {plot_file}")
 

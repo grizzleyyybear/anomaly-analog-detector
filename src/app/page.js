@@ -1,4 +1,3 @@
-// src/app/page.js
 'use client';
 
 import { useMemo } from 'react';

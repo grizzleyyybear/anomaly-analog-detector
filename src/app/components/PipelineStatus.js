@@ -6,6 +6,7 @@ export default function PipelineStatus({ stage1, stage2, connectionStatus }) {
   };
 
   const getStatusLabel = (status) => {
+    if (!status) return 'Unknown';
     const labels = {
       active: 'Active',
       idle: 'Idle',

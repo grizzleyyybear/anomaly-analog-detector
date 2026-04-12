@@ -58,15 +58,18 @@ Open [http://localhost:3000](http://localhost:3000). The dashboard will show "Wa
 
 ### 4. Start the ML agent
 
-The ML pipeline runs separately. Clone and set up the companion repo:
+The ML pipeline lives in the `ml/` directory of this repo:
 
 ```bash
-git clone https://github.com/grizzleyyybear/ml_anomaly_detection.git
-cd ml_anomaly_detection
+cd ml
 python -m venv venv
 source venv/bin/activate    # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-python agent.py
+cp .env.example .env        # add your Ably key
+python src/generate_data.py
+python src/corrector_model.py
+cd src && python train_and_evaluate.py && cd ..
+python live_agent.py
 ```
 
 Once running, the dashboard will light up with live data.

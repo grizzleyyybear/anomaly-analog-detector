@@ -1,11 +1,12 @@
 import logging
 import torch
+from pathlib import Path
 import sys
 
-sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config
 from model import LSTMAutoencoder
-from corrector_model import ADCCorrector, load_corrector
+from corrector_model import load_corrector
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%H:%M:%S")
 log = logging.getLogger(__name__)
