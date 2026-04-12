@@ -42,6 +42,8 @@ next-env.d.ts
 # ML artifacts
 ml/checkpoints/*.ckpt
 ml/checkpoints/*.pt
+ml/checkpoints/*.joblib
+ml/checkpoints/*.json
 ml/checkpoints/onnx/
 ml/data/*.csv
 ml/lightning_logs/

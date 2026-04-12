@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.env*
+!.env.example
+ml/checkpoints
+ml/data
+ml/venv
+ml/.venv
+ml/__pycache__
+*.pyc
+*.ckpt
+*.pt
+*.onnx

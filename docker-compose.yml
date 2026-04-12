@@ -1,0 +1,28 @@
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - ABLY_API_KEY=${ABLY_API_KEY}
+    restart: unless-stopped
+    depends_on:
+      ml-agent:
+        condition: service_started
+
+  ml-agent:
+    build:
+      context: .
+      dockerfile: ml/Dockerfile
+    environment:
+      - ABLY_API_KEY=${ABLY_API_KEY}
+    volumes:
+      - ml-checkpoints:/app/checkpoints
+      - ml-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  ml-checkpoints:
+  ml-data:

@@ -1,4 +1,5 @@
 import "./globals.css";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 export const metadata = {
   title: "Anomaly Analog Detector | Real-Time Industrial Signal Monitoring",
@@ -9,7 +10,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ErrorBoundary>{children}</ErrorBoundary>
+      </body>
     </html>
   );
 }
