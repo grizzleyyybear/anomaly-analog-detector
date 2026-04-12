@@ -18,7 +18,7 @@ export async function GET() {
     client.close();
     return Response.json(tokenRequestData);
   } catch (err) {
-    console.error("Ably token error:", err.message || err);
+    console.error("Ably token error:", err instanceof Error ? err.message : err);
     return Response.json(
       { error: "Failed to generate token" },
       { status: 500 }

@@ -1,4 +1,15 @@
-export default function AnomalyLog({ entries }) {
+export interface AnomalyEntry {
+  status: string;
+  timestamp: string;
+  time: string;
+  reconstructionError: number | null;
+}
+
+export interface AnomalyLogProps {
+  entries: AnomalyEntry[];
+}
+
+export default function AnomalyLog({ entries }: AnomalyLogProps) {
   if (!entries || entries.length === 0) {
     return (
       <div className="anomaly-log">
@@ -9,9 +20,9 @@ export default function AnomalyLog({ entries }) {
   }
 
   return (
-    <div className="anomaly-log">
+    <section className="anomaly-log" aria-label="Anomaly event log">
       <h3 className="anomaly-log__title">Event Log</h3>
-      <div className="anomaly-log__list">
+      <div className="anomaly-log__list" role="log" aria-live="polite">
         {entries.map((entry, i) => (
           <div
             key={`${entry.timestamp}-${i}`}
@@ -20,6 +31,8 @@ export default function AnomalyLog({ entries }) {
                 ? 'anomaly-log__entry--anomaly'
                 : 'anomaly-log__entry--normal'
             }`}
+            role="article"
+            aria-label={`${entry.status} at ${entry.time}`}
           >
             <span className="anomaly-log__time">{entry.time}</span>
             <span className="anomaly-log__status">{entry.status}</span>
@@ -31,6 +44,6 @@ export default function AnomalyLog({ entries }) {
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

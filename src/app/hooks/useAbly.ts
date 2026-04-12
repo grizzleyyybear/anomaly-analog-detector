@@ -2,23 +2,61 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Realtime } from 'ably';
+import type { TokenParams, TokenRequest, ErrorInfo } from 'ably';
 
 const MAX_HISTORY = 200;
 const MAX_LOG = 50;
 
-export function useAbly() {
-  const [connectionStatus, setConnectionStatus] = useState('connecting');
-  const [signalHistory, setSignalHistory] = useState([]);
-  const [currentSignal, setCurrentSignal] = useState(null);
-  const [anomalyStatus, setAnomalyStatus] = useState({ status: 'Waiting...', timestamp: null });
-  const [anomalyLog, setAnomalyLog] = useState([]);
-  const [pipelineInfo, setPipelineInfo] = useState({ stage1: 'idle', stage2: 'idle' });
-  const [reconstructionError, setReconstructionError] = useState(null);
-  const [threshold, setThreshold] = useState(null);
-  const ablyRef = useRef(null);
+export interface SignalPoint {
+  time: string;
+  value: number;
+  timestamp: string;
+  raw: number | null;
+  corrected: number | string;
+}
+
+export interface AnomalyEntry {
+  status: string;
+  timestamp: string;
+  time: string;
+  reconstructionError: number | null;
+  threshold: number | null;
+}
+
+export interface PipelineInfo {
+  stage1: string;
+  stage2: string;
+}
+
+export interface UseAblyReturn {
+  connectionStatus: string;
+  signalHistory: SignalPoint[];
+  currentSignal: SignalPoint | null;
+  anomalyStatus: AnomalyEntry;
+  anomalyLog: AnomalyEntry[];
+  pipelineInfo: PipelineInfo;
+  reconstructionError: number | null;
+  threshold: number | null;
+}
+
+export function useAbly(): UseAblyReturn {
+  const [connectionStatus, setConnectionStatus] = useState<string>('connecting');
+  const [signalHistory, setSignalHistory] = useState<SignalPoint[]>([]);
+  const [currentSignal, setCurrentSignal] = useState<SignalPoint | null>(null);
+  const [anomalyStatus, setAnomalyStatus] = useState<AnomalyEntry>({
+    status: 'Waiting...', timestamp: '', time: '', reconstructionError: null, threshold: null,
+  });
+  const [anomalyLog, setAnomalyLog] = useState<AnomalyEntry[]>([]);
+  const [pipelineInfo, setPipelineInfo] = useState<PipelineInfo>({ stage1: 'idle', stage2: 'idle' });
+  const [reconstructionError, setReconstructionError] = useState<number | null>(null);
+  const [threshold, setThreshold] = useState<number | null>(null);
+  const ablyRef = useRef<Realtime | null>(null);
 
   useEffect(() => {
-    const authCallback = (tokenParams, callback) => {
+    const authCallback = (
+      tokenParams: TokenParams,
+      callback: (error: ErrorInfo | string | null, tokenOrDetails: TokenRequest | string | null) => void,
+    ) => {
       fetch('/api/ably-token')
         .then(res => {
           if (!res.ok) throw new Error(`Token fetch failed: ${res.status}`);
@@ -45,7 +83,7 @@ export function useAbly() {
       const value = typeof data === 'object' ? data.value : data;
       const timestamp = data?.timestamp || new Date().toISOString();
 
-      const point = {
+      const point: SignalPoint = {
         time: new Date(timestamp).toLocaleTimeString(),
         value: parseFloat(value),
         timestamp,
@@ -69,7 +107,7 @@ export function useAbly() {
       const status = typeof data === 'object' ? data.status : data;
       const timestamp = data?.timestamp || new Date().toISOString();
 
-      const entry = {
+      const entry: AnomalyEntry = {
         status,
         timestamp,
         time: new Date(timestamp).toLocaleTimeString(),

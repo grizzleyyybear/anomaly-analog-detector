@@ -2,7 +2,29 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-export default function SignalChart({ data, anomalyLog }) {
+export interface SignalPoint {
+  value: number;
+  time: string;
+  timestamp: string;
+}
+
+export interface AnomalyEntry {
+  status: string;
+  timestamp: string;
+  time: string;
+  reconstructionError: number | null;
+}
+
+interface ChartDataPoint extends SignalPoint {
+  anomaly: number | null;
+}
+
+export interface SignalChartProps {
+  data: SignalPoint[];
+  anomalyLog: AnomalyEntry[];
+}
+
+export default function SignalChart({ data, anomalyLog }: SignalChartProps) {
   if (!data || data.length === 0) {
     return (
       <div className="chart-placeholder">
@@ -15,7 +37,7 @@ export default function SignalChart({ data, anomalyLog }) {
     ...point,
     anomaly: anomalyLog.some(a =>
       a.status === 'Anomaly Detected' &&
-      Math.abs(new Date(a.timestamp) - new Date(point.timestamp)) < 2000
+      Math.abs(new Date(a.timestamp).getTime() - new Date(point.timestamp).getTime()) < 2000
     ) ? point.value : null,
   }));
 

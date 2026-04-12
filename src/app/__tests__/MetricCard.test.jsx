@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import MetricCard from '../components/MetricCard.jsx';
+import MetricCard from '../components/MetricCard';
 
 describe('MetricCard', () => {
   it('renders label and value', () => {

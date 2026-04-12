@@ -2,12 +2,21 @@
 
 import { useMemo } from 'react';
 import { useAbly } from './hooks/useAbly';
+import type { SignalPoint } from './hooks/useAbly';
 import SignalChart from './components/SignalChart';
 import MetricCard from './components/MetricCard';
 import AnomalyLog from './components/AnomalyLog';
 import PipelineStatus from './components/PipelineStatus';
 
-function computeStats(history) {
+interface SignalStats {
+  min: string;
+  max: string;
+  mean: string;
+  stdDev: string;
+  count: number;
+}
+
+function computeStats(history: SignalPoint[]): SignalStats {
   if (history.length === 0) return { min: '—', max: '—', mean: '—', stdDev: '—', count: 0 };
 
   const values = history.map(p => p.value);
@@ -46,17 +55,21 @@ export default function Home() {
     : null;
 
   return (
-    <main className="dashboard">
+    <main className="dashboard" role="main" aria-label="Anomaly detection dashboard">
       <header className="dashboard__header">
         <div className="dashboard__title-group">
           <h1 className="dashboard__title">
-            <span className="dashboard__title-icon">◈</span>
+            <span className="dashboard__title-icon" aria-hidden="true">◈</span>
             Anomaly Analog Detector
           </h1>
           <p className="dashboard__subtitle">Real-Time Industrial Signal Monitoring</p>
         </div>
-        <div className={`connection-badge connection-badge--${connectionStatus}`}>
-          <span className="connection-badge__dot" />
+        <div
+          className={`connection-badge connection-badge--${connectionStatus}`}
+          role="status"
+          aria-label={`Connection status: ${connectionStatus}`}
+        >
+          <span className="connection-badge__dot" aria-hidden="true" />
           {connectionStatus === 'connected' ? 'Live' : connectionStatus}
         </div>
       </header>
@@ -104,22 +117,22 @@ export default function Home() {
       <div className="dashboard__grid-2">
         <section className="dashboard__section">
           <h2 className="section-title">Signal Statistics</h2>
-          <div className="stats-grid">
-            <div className="stat-item">
-              <span className="stat-label">Min</span>
-              <span className="stat-value">{stats.min}</span>
+          <div className="stats-grid" role="table" aria-label="Signal statistics">
+            <div className="stat-item" role="row">
+              <span className="stat-label" role="rowheader">Min</span>
+              <span className="stat-value" role="cell">{stats.min}</span>
             </div>
-            <div className="stat-item">
-              <span className="stat-label">Max</span>
-              <span className="stat-value">{stats.max}</span>
+            <div className="stat-item" role="row">
+              <span className="stat-label" role="rowheader">Max</span>
+              <span className="stat-value" role="cell">{stats.max}</span>
             </div>
-            <div className="stat-item">
-              <span className="stat-label">Mean</span>
-              <span className="stat-value">{stats.mean}</span>
+            <div className="stat-item" role="row">
+              <span className="stat-label" role="rowheader">Mean</span>
+              <span className="stat-value" role="cell">{stats.mean}</span>
             </div>
-            <div className="stat-item">
-              <span className="stat-label">Std Dev</span>
-              <span className="stat-value">{stats.stdDev}</span>
+            <div className="stat-item" role="row">
+              <span className="stat-label" role="rowheader">Std Dev</span>
+              <span className="stat-value" role="cell">{stats.stdDev}</span>
             </div>
           </div>
         </section>
@@ -133,7 +146,12 @@ export default function Home() {
                 <span>Threshold: <strong>{threshold?.toFixed(6) ?? '—'}</strong></span>
               </div>
               {errorPercent && (
-                <div className="error-gauge__bar-wrapper">
+                <div className="error-gauge__bar-wrapper" role="progressbar"
+                  aria-valuenow={parseFloat(errorPercent)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label="Reconstruction error as percentage of threshold"
+                >
                   <div
                     className={`error-gauge__bar ${parseFloat(errorPercent) > 100 ? 'error-gauge__bar--danger' : ''}`}
                     style={{ width: `${Math.min(parseFloat(errorPercent), 100)}%` }}

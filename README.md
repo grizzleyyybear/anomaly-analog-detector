@@ -6,10 +6,15 @@
 
 [![CI](https://github.com/grizzleyyybear/anomaly-analog-detector/actions/workflows/ci.yml/badge.svg)](https://github.com/grizzleyyybear/anomaly-analog-detector/actions)
 [![Next.js 15](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-Lightning-ee4c2c?logo=pytorch)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 </div>
+
+---
+
+> **Demo**: Run `npm run dev` + `python ml/live_agent.py` and open [localhost:3000](http://localhost:3000) to see the dashboard live. The ML agent generates synthetic sensor data with injected anomalies, so you can see the full pipeline working out of the box — no real hardware needed.
 
 ---
 
@@ -36,8 +41,14 @@ Sensor Signal → ADC Corrector (MLP) → LSTM Autoencoder → Ably WebSocket �
 | **ONNX Export** | Both models exportable for edge deployment |
 | **Train/Val/Test Split** | 70/15/15 with P/R/F1 evaluation on held-out test set |
 | **Feature Normalization** | StandardScaler persisted and shared between training and inference |
+| **TypeScript (strict)** | Fully typed React components, hooks, and API routes |
+| **Accessible UI** | ARIA roles, labels, live regions — screen reader friendly |
+| **Security Headers** | CSP, HSTS, X-Frame-Options, Permissions-Policy |
 | **Docker Ready** | Multi-stage Dockerfile + docker-compose for both services |
 | **CI/CD** | GitHub Actions: lint, build, test on every push |
+| **Pre-commit Hooks** | Husky + lint-staged — linting runs before every commit |
+| **Code Coverage** | Vitest V8 coverage with `npm run test:coverage` |
+| **Model Versioning** | `model_metadata.json` tracking data hash, hyperparams, metrics |
 | **Health Monitoring** | `/api/health` endpoint with uptime, version, status |
 | **Error Boundaries** | React ErrorBoundary for graceful crash recovery |
 
@@ -45,18 +56,19 @@ Sensor Signal → ADC Corrector (MLP) → LSTM Autoencoder → Ably WebSocket �
 
 ```
 anomaly-analog-detector/
-├── src/app/                          # Next.js 15 dashboard
+├── src/app/                          # Next.js 15 dashboard (TypeScript)
 │   ├── api/
-│   │   ├── ably-token/route.js       # secure WebSocket token endpoint
-│   │   └── health/route.js           # health check endpoint
+│   │   ├── ably-token/route.ts       # secure WebSocket token endpoint
+│   │   └── health/route.ts           # health check endpoint
 │   ├── components/
-│   │   ├── SignalChart.jsx           # rolling waveform with anomaly markers
-│   │   ├── MetricCard.jsx            # live metric display cards
-│   │   ├── AnomalyLog.jsx           # timestamped event history
-│   │   ├── PipelineStatus.jsx        # stage health indicators
-│   │   └── ErrorBoundary.jsx         # crash recovery wrapper
-│   ├── hooks/useAbly.jsx             # WebSocket connection + state management
-│   ├── page.jsx                      # dashboard composition
+│   │   ├── SignalChart.tsx            # rolling waveform with anomaly markers
+│   │   ├── MetricCard.tsx             # live metric display cards
+│   │   ├── AnomalyLog.tsx            # timestamped event history
+│   │   ├── PipelineStatus.tsx         # stage health indicators
+│   │   └── ErrorBoundary.tsx          # crash recovery wrapper
+│   ├── hooks/useAbly.ts              # WebSocket connection + state management
+│   ├── __tests__/                    # Vitest test suite
+│   ├── page.tsx                      # dashboard composition
 │   └── globals.css                   # dark industrial theme
 │
 ├── ml/                               # Python ML pipeline
@@ -69,14 +81,18 @@ anomaly-analog-detector/
 │   │   ├── model.py                  # LSTM Autoencoder (PyTorch Lightning)
 │   │   ├── data_preprocessing.py     # scaling, splitting, sequence creation
 │   │   ├── train_and_evaluate.py     # training + threshold + P/R/F1 metrics
-│   │   └── export_onnx.py           # ONNX export with verification
+│   │   ├── export_onnx.py           # ONNX export with verification
+│   │   └── version_model.py         # model metadata + dataset hashing
 │   └── tests/
 │       └── test_pipeline.py          # pytest suite for ML components
 │
 ├── .github/workflows/ci.yml         # GitHub Actions CI pipeline
+├── .husky/pre-commit                 # pre-commit lint hook
 ├── Dockerfile                        # dashboard container (multi-stage)
 ├── ml/Dockerfile                     # ML agent container
-└── docker-compose.yml                # full-stack orchestration
+├── docker-compose.yml                # full-stack orchestration
+├── tsconfig.json                     # TypeScript strict mode config
+└── CONTRIBUTING.md                   # contribution guidelines
 ```
 
 ## Getting started
@@ -148,6 +164,9 @@ docker compose up --build
 # Dashboard tests
 npm test
 
+# Dashboard tests with coverage
+npm run test:coverage
+
 # ML tests
 cd ml && python -m pytest tests/ -v
 ```
@@ -203,15 +222,16 @@ docker compose up -d
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Next.js 15, React 19, Recharts, Tailwind CSS 4 |
-| Backend API | Next.js Route Handlers |
+| Frontend | Next.js 15, React 19, TypeScript (strict), Recharts, Tailwind CSS 4 |
+| Backend API | Next.js Route Handlers (security headers, health checks) |
 | ML Framework | PyTorch, PyTorch Lightning |
 | Data Processing | scikit-learn, pandas, NumPy |
 | Real-time | Ably WebSockets |
 | Export | ONNX Runtime |
 | Containers | Docker, Docker Compose |
 | CI/CD | GitHub Actions |
-| Testing | Vitest + Testing Library, pytest |
+| Testing | Vitest + Testing Library + V8 coverage, pytest |
+| Code Quality | ESLint, Husky, lint-staged |
 
 ## License
 

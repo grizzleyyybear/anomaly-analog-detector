@@ -1,9 +1,14 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-let pkg;
+interface PackageInfo {
+  name: string;
+  version: string;
+}
+
+let pkg: PackageInfo;
 try {
-  pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf-8'));
+  pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf-8')) as PackageInfo;
 } catch {
   pkg = { name: 'anomaly-dashboard', version: 'unknown' };
 }

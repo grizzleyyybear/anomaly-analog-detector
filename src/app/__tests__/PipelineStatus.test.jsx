@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import PipelineStatus from '../components/PipelineStatus.jsx';
+import PipelineStatus from '../components/PipelineStatus';
 
 describe('PipelineStatus', () => {
   it('renders all three pipeline stages', () => {
